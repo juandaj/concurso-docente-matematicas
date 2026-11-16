@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111b35">
+  <meta name="description" content="Simulador gratuito de preparación para el concurso docente de Matemáticas en Armenia y Quindío: preguntas originales, simulacros, explicaciones y seguimiento.">
+  <title>AulaMérito | Concurso Docente Matemáticas</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="questions.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#inicio" aria-label="AulaMérito, ir al inicio">
+        <div class="brand-mark">∑</div><div><strong>Aula<span>Mérito</span></strong><small>MATEMÁTICAS · COLOMBIA</small></div>
+      </a>
+      <div class="sidebar-label">TU ESPACIO</div>
+      <nav class="side-nav" aria-label="Menú principal">
+        <button class="nav-link active" data-view="inicio"><span>⌂</span> Mi preparación</button>
+        <button class="nav-link" data-view="simulacros"><span>▣</span> Simulacros</button>
+        <button class="nav-link" data-view="temas"><span>◫</span> Practicar por área</button>
+        <button class="nav-link" data-view="progreso"><span>◷</span> Mi progreso</button>
+        <button class="nav-link" data-view="recursos"><span>◈</span> Guía y fuentes</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="side-tip"><span class="tip-icon">✦</span><strong>Un paso a la vez.</strong><p>La constancia supera a las jornadas de estudio aisladas.</p></div>
+        <p class="sidebar-foot">Proyecto independiente de preparación. No afiliado a la CNSC.</p>
+      </div>
+    </aside>
+
+    <div class="main-column">
+      <header class="topbar">
+        <button id="mobile-menu" class="mobile-menu icon-button" aria-label="Abrir menú">☰</button>
+        <div class="topbar-context"><span class="eyebrow">CONCURSO DOCENTE 2026–2027</span><span class="topbar-sub">Docente de Matemáticas · Quindío</span></div>
+        <div class="topbar-right"><span class="online-dot"></span> Tus avances se guardan en este dispositivo <span class="top-avatar">M</span></div>
+      </header>
+      <main id="app-content" tabindex="-1" aria-live="polite"></main>
+      <footer class="page-footer"><span>AulaMérito · Herramienta de estudio independiente</span><span>Fuentes: CNSC · MEN · Función Pública</span></footer>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="modal-root"></div>
+</body>
+</html>
