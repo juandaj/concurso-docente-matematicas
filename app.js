@@ -44,7 +44,7 @@ CONTENT.innerHTML='<section class="hero"><div><span class="hero-tag">PREPARACIÓ
 heroResume()+
 '<div class="stats-grid">'+metric("Simulacros realizados",String(total),"Sesiones finalizadas","▣")+metric("Promedio",avgScore(),"Pruebas de conocimientos","◷")+metric("Mejor resultado",bestScore(),"Tu marca personal","★")+metric("Banco de preguntas",number(BANK.filter(q=>q.answer!==null).length),"Más situaciones de reflexión","∑")+"</div>"+
 section("Prepara cada componente",'<button class="link-button" data-action="go-temas">Ver todas las áreas →</button>')+
-'<div class="topic-grid">'+CORE.map(topicCard).join("")+'</div>'+
+'<div class="topic-grid">'+CORE.concat(["blandas"]).map(topicCard).join("")+'</div>'+
 section("Estructura de referencia del concurso")+
 '<div class="grid-2"><div class="card"><h3>Conocimientos específicos y pedagógicos</h3><p style="font-size:12px">Distribución para docentes según Decreto 574 de 2022. La prueba de conocimientos tiene carácter eliminatorio.</p>'+CORE.map(a=>'<div class="score-bar"><div class="score-row"><span>'+esc(areaName(a))+'</span><strong>'+AREAS[a].weight+' %</strong></div><div class="weight-track"><div class="weight-fill" style="width:'+AREAS[a].weight+'%"></div></div></div>').join("")+'</div><div class="card"><h3>Una rutina que sí se sostiene</h3><div class="steps"><div class="step"><p><strong>Practica 20 preguntas.</strong> Empieza con una sesión breve sin distracciones.</p></div><div class="step"><p><strong>Revisa tus errores.</strong> Comprende por qué una opción es mejor que las demás.</p></div><div class="step"><p><strong>Refuerza un componente.</strong> Dedica más tiempo a las áreas de menor puntuación.</p></div><div class="step"><p><strong>Realiza un simulacro amplio.</strong> Comprueba el progreso en condiciones cronometradas.</p></div></div></div></div>'+
 '<div style="margin-top:21px">'+infoBox()+'</div>';
@@ -56,7 +56,7 @@ function modeCard(icon,title,desc,count,mins,action){
 return '<div class="mode-card"><span class="mode-emoji">'+icon+'</span><h3>'+title+'</h3><p>'+desc+'</p><div class="mode-meta">'+tag(count+" preguntas","pill-purple")+tag(mins,"")+'</div>'+button("Iniciar →",action,"btn-primary")+"</div>";
 }
 function sims(){
-CONTENT.innerHTML=header("ENTRENA CON INTENCIÓN","Simulacros de práctica","Elige la duración; el peso de las cuatro áreas se mantiene en 20 / 20 / 40 / 20.")+
+CONTENT.innerHTML=header("ENTRENA CON INTENCIÓN","Simulacros de práctica","Elige la duración. El simulacro mixto usa la distribución histórica 20 / 20 / 40 / 20, no confirmada para 2026. Practica competencias blandas por separado.")+
 (active?'<div style="margin-bottom:20px">'+heroResume()+'</div>':"")+
 '<div class="grid-3">'+
 modeCard("⚡","Rápido","Una sesión de repaso cuando dispones de poco tiempo. Preguntas aleatorias.",20,"30 min · sugeridos","start-quick")+
@@ -68,7 +68,7 @@ section("Distribución de preguntas")+
 }
 function temas(){
 CONTENT.innerHTML=header("APRENDIZAJE ENFOCADO","Práctica por componente","Aprende con retroalimentación inmediata después de cada respuesta.")+
-'<div class="topic-grid">'+CORE.map(topicCard).join("")+'</div>'+
+'<div class="topic-grid">'+CORE.concat(["blandas"]).map(topicCard).join("")+'</div>'+
 section("Práctica situacional y psicotécnica")+
 '<div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap"><div><h3>◇ Situaciones de criterio profesional</h3><p style="margin:4px 0 0;font-size:12px;max-width:600px">12 situaciones de reflexión sobre ética, convivencia y trabajo docente. Sin puntuación ni supuestas respuestas oficiales; no sustituye la evaluación psicotécnica.</p></div>'+button("Comenzar →","start-psych","btn-soft")+"</div>"+
 section("Cómo practicar mejor")+
@@ -76,12 +76,12 @@ section("Cómo practicar mejor")+
 }
 function progreso(){
 const valid=validResults();const total=history.length;const recent=history.slice().reverse();
-const counters={};CORE.forEach(a=>counters[a]={correct:0,total:0});
+const counters={};CORE.concat(["blandas"]).forEach(a=>counters[a]={correct:0,total:0});
 valid.forEach(h=>{Object.keys(h.byArea||{}).forEach(a=>{if(counters[a]){counters[a].correct+=h.byArea[a].correct;counters[a].total+=h.byArea[a].total}})});
 CONTENT.innerHTML=header("EVOLUCIÓN PERSONAL","Mi progreso","Tu historial se almacena únicamente en este navegador, sin cuentas ni servidor.")+
 '<div class="stats-grid">'+metric("Sesiones completadas",total,"Incluye práctica situacional","▣")+metric("Promedio general",avgScore(),"Solo conocimientos","◷")+metric("Mejor puntaje",bestScore(),"Tu mejor sesión","★")+metric("Preguntas resueltas",number(history.reduce((s,h)=>s+h.answered,0)),"En sesiones terminadas","✎")+"</div>"+
 section("Dominio por componente")+
-'<div class="card">'+CORE.map(a=>{let z=counters[a],p=z.total?Math.round(100*z.correct/z.total):0;return '<div class="score-bar"><div class="score-row"><span>'+areaName(a)+'</span><strong>'+(z.total?p+" %":"Sin datos")+'</strong></div><div class="weight-track"><div class="weight-fill" style="width:'+p+'%;background:'+(p<60?"#e4a53d":"#6256e8")+'"></div></div><span class="subtle">'+z.correct+' aciertos de '+z.total+' respuestas</span></div>'}).join("")+"</div>"+
+'<div class="card">'+CORE.concat(["blandas"]).map(a=>{let z=counters[a],p=z.total?Math.round(100*z.correct/z.total):0;return '<div class="score-bar"><div class="score-row"><span>'+areaName(a)+'</span><strong>'+(z.total?p+" %":"Sin datos")+'</strong></div><div class="weight-track"><div class="weight-fill" style="width:'+p+'%;background:'+(p<60?"#e4a53d":"#6256e8")+'"></div></div><span class="subtle">'+z.correct+' aciertos de '+z.total+' respuestas</span></div>'}).join("")+"</div>"+
 section("Historial de sesiones")+
 '<div class="card">'+(recent.length?recent.map(h=>'<div class="history-row"><div class="history-main"><strong>'+esc(h.label)+'</strong><small>'+date(h.date)+' · '+h.answered+' de '+h.total+' respondidas</small></div><div style="display:flex;align-items:center;gap:13px"><div class="history-value">'+(h.psych?"—":h.score+"%")+'</div>'+button("Revisar","review-"+h.id,"btn-outline")+"</div></div>").join(""):'<div class="empty-state"><span class="empty-icon">◷</span><h3>Aún no hay resultados</h3><p>Realiza una sesión para ver tu evolución por componente.</p>'+button("Empezar ahora","go-simulacros","btn-primary")+"</div>")+"</div>"+
 '<div style="margin-top:18px;display:flex;justify-content:flex-end">'+(total?button("Exportar progreso (JSON)","export","btn-outline"):"")+'</div>';
@@ -94,11 +94,13 @@ const sources=[
 ["MEN · Estándares de Competencias","Referentes curriculares para educación básica y media.","https://www.mineducacion.gov.co/1780/w3-article-340021.html"],
 ["Colombia Aprende · DBA Matemáticas","Aprendizajes estructurantes, evidencias y secuencias por grado.","https://colombiaaprende.edu.co/recurso-coleccion/derechos-basicos-de-aprendizaje-matematicas"],
 ["MEN · Estándares Matemáticas (PDF)","Cinco pensamientos matemáticos y desarrollo de competencias.","https://www.mineducacion.gov.co/1621/articles-116042_archivo_pdf2.pdf"],
+["MEN · Guía 31: competencias comportamentales","Referentes de liderazgo, trabajo colaborativo, compromiso y comunicación docente.","https://www.mineducacion.gov.co/portal/men/Publicaciones/Guias/169241:Guia-No-31-Guia-Metodologica-Evaluacion-Anual-de-Desempeno-Laboral"],
+["MEN · Resolución 3842 de 2022","Manual de funciones, requisitos y competencias docentes.","https://www.mineducacion.gov.co/1780/articles-373226_recurso_2.pdf"],
 ["SIMO · Inscripciones y OPEC","Consulta de empleos, requisitos específicos y etapas.","https://simo.cnsc.gov.co"]
 ];
 function recursos(){
 CONTENT.innerHTML=header("CONOCE LA CONVOCATORIA","Guía y fuentes oficiales","Recursos verificables para estudiar sin depender de bancos de preguntas dudosos.")+
-'<div class="warning-box"><strong>Lo que este simulador sí y no representa.</strong> La estructura de cuatro componentes proviene del Decreto 574 de 2022. Los ejercicios, opciones, cronómetros, distribución interna por temas y puntuaciones de práctica son elaboraciones independientes. La guía oficial que publique la CNSC para las pruebas 2026–2027 prevalecerá sobre cualquier ejemplo de esta web. La práctica situacional NO genera una puntuación psicotécnica.</div>'+
+'<div class="warning-box"><strong>Lo que este simulador sí y no representa.</strong> La estructura 20/20/40/20 proviene del Decreto 574 de 2022. El anexo técnico de 2026 contempla también competencias blandas; su peso interno definitivo está pendiente de publicación. Los ejercicios, opciones, cronómetros, distribución interna por temas y puntuaciones de práctica son elaboraciones independientes. La guía oficial que publique la CNSC para las pruebas 2026–2027 prevalecerá sobre cualquier ejemplo de esta web. La práctica situacional NO genera una puntuación psicotécnica.</div>'+
 section("Material de estudio prioritario")+
 '<div class="source-list">'+sources.map(s=>'<div class="source-row"><div><h3>'+esc(s[0])+'</h3><p>'+esc(s[1])+'</p></div><a href="'+esc(s[2])+'" target="_blank" rel="noopener noreferrer">Consultar ↗</a></div>').join("")+"</div>"+
 section("Ruta sugerida para una ingeniera electrónica")+
@@ -123,7 +125,7 @@ const ts=Date.now();active={id:ts,mode,area:area||null,ids:picked.map(q=>q.id),o
 }
 function finish(auto){
 if(!active)return;
-const s=active;const rows=s.ids.map(id=>lookup[id]);const per={};CORE.forEach(k=>per[k]={correct:0,total:0});
+const s=active;const rows=s.ids.map(id=>lookup[id]);const per={};CORE.concat(["blandas"]).forEach(k=>per[k]={correct:0,total:0});
 let correct=0,responded=0;
 rows.forEach(q=>{const answer=s.answers[q.id];if(answer!==undefined)responded++;if(q.answer!==null){per[q.area].total++;if(answer===q.answer){correct++;per[q.area].correct++}}});
 const psych=s.mode==="psych";const score=psych?null:Math.round(correct/rows.length*100);
@@ -163,7 +165,7 @@ reviewId=h.id;const psych=h.psych,missed=h.total-h.answered;
 CONTENT.innerHTML=header("RESULTADOS DE LA SESIÓN",psych?"Tu reflexión ha quedado guardada":"Una oportunidad para avanzar","Revisa tus respuestas y descubre qué estudiar a continuación.")+
 '<div class="score-hero"><div><span class="eyebrow" style="color:#cac7ff">'+esc(h.label)+'</span><h2 style="font-size:22px;margin-top:9px">'+(psych?"Práctica situacional completada":h.score>=80?"¡Muy buen trabajo!":h.score>=60?"¡Buen punto de partida!":"Cada error es una pista para mejorar")+'</h2><p>'+date(h.date)+' · '+fmtSec(h.seconds)+' de estudio · '+h.answered+' respuestas registradas</p></div><div><span class="score-number">'+(psych?"—":h.score+"%")+'</span><p>'+(psych?"Sin calificación (orientativo)":h.correct+" de "+h.total+" correctas")+"</p></div></div>"+
 '<div class="stats-grid" style="margin:0 0 22px">'+metric("Respondidas",h.answered+"/"+h.total,"Cobertura de la sesión","◈")+metric("Sin responder",missed,"Preguntas pendientes","◷")+metric("Duración",fmtSec(h.seconds),"Tiempo empleado","⌛")+metric(psych?"Reflexión":"Aciertos",psych?"—":h.correct,"Revisión disponible","✓")+"</div>"+
-(!psych?'<div class="card"><h3>Resultado por componente</h3>'+CORE.filter(a=>h.byArea[a].total).map(a=>{let z=h.byArea[a],p=Math.round(z.correct/z.total*100);return '<div class="score-bar"><div class="score-row"><span>'+areaName(a)+'</span><strong>'+z.correct+'/'+z.total+' · '+p+' %</strong></div><div class="weight-track"><div class="weight-fill" style="width:'+p+'%;background:'+(p<60?"#e8a644":"#6256e8")+'"></div></div></div>'}).join("")+'<p class="subtle">La nota mostrada es el porcentaje de aciertos de este ejercicio. No es la puntuación oficial de la CNSC.</p></div>':'<div class="note-box">Estas preguntas no tienen una respuesta correcta oficial; ayudan a reflexionar sobre escenarios habituales de la profesión. No permiten predecir un resultado psicotécnico.</div>')+
+(!psych?'<div class="card"><h3>Resultado por componente</h3>'+CORE.concat(["blandas"]).filter(a=>h.byArea[a]?.total).map(a=>{let z=h.byArea[a],p=Math.round(z.correct/z.total*100);return '<div class="score-bar"><div class="score-row"><span>'+areaName(a)+'</span><strong>'+z.correct+'/'+z.total+' · '+p+' %</strong></div><div class="weight-track"><div class="weight-fill" style="width:'+p+'%;background:'+(p<60?"#e8a644":"#6256e8")+'"></div></div></div>'}).join("")+'<p class="subtle">La nota mostrada es el porcentaje de aciertos de este ejercicio. No es la puntuación oficial de la CNSC.</p></div>':'<div class="note-box">Estas preguntas no tienen una respuesta correcta oficial; ayudan a reflexionar sobre escenarios habituales de la profesión. No permiten predecir un resultado psicotécnico.</div>')+
 '<div class="section-heading"><h2>Revisión detallada</h2><div style="display:flex;gap:6px;flex-wrap:wrap">'+button("Todas","filter-all",reviewFilter==="all"?"btn-primary":"btn-outline")+(!psych?button("Errores y omisiones","filter-wrong",reviewFilter==="wrong"?"btn-primary":"btn-outline"):"")+'</div></div><div class="review-list" id="review-content">'+renderReviewContent(h)+'</div>'+
 '<div style="margin-top:25px;display:flex;gap:10px;flex-wrap:wrap">'+button("Nuevo simulacro →","go-simulacros","btn-primary")+button("Mi progreso","go-progreso","btn-outline")+"</div>";
 }
