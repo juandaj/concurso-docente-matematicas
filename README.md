@@ -42,8 +42,8 @@ No requiere comprar dominio, alquilar servidor o ejecutar un build. [Guía ofici
 
 ## Desarrollo
 
-Aplicación estática en \`index.html\`, \`styles.css\`, \`app.js\` y \`questions.js\`. Para probar localmente: ejecutar \`python -m http.server 8000\` en este directorio y abrir \`http://localhost:8000\`. No hay dependencias.
+Aplicación estática en `index.html`, `styles.css`, `app.js` y `questions.js`. Para probar localmente: ejecutar `python -m http.server 8000` en este directorio y abrir `http://localhost:8000`. No hay dependencias.
 
-Para ampliar el banco, añadir preguntas con cuatro opciones y justificación individual en \`questions.js\`, evitando repeticiones, respuestas predecibles y distractores absurdos.
+Para ampliar el banco, añadir preguntas con cuatro opciones y justificación individual en `questions.js`, evitando repeticiones, respuestas predecibles y distractores absurdos.
 
 > **Aviso legal y de privacidad:** Proyecto educativo **independiente, no afiliado** a la CNSC, MEN o ICFES. No requiere cédula, correo ni contraseñas. El progreso se guarda solo en el dispositivo; borrar datos del navegador puede borrarlo. No se publican ni utilizan preguntas reservadas. Última revisión de referencias: **16 noviembre 2026**.
