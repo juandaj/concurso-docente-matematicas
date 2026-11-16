@@ -1,0 +1,11 @@
+{
+  "name": "aulamerito-concurso-docente-matematicas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Simulador independiente y gratuito para el concurso docente de Matemáticas en Colombia",
+  "scripts": {
+    "test": "node tests/quality-check.cjs",
+    "check": "node --check questions.js && node --check app.js && node tests/quality-check.cjs"
+  },
+  "license": "UNLICENSED"
+}
