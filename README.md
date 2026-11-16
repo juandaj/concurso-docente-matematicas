@@ -6,7 +6,7 @@ Simulador **gratuito, público, sin registro ni backend**, diseñado para practi
 
 ## Qué incluye
 
-- **132 ítems originales:** 24 lectura crítica, 24 razonamiento cuantitativo, 48 conocimientos específicos de Matemáticas, 24 pedagogía y 12 situaciones de reflexión (sin calificación psicotécnica).
+- **152 ítems originales:** 24 lectura crítica, 24 razonamiento cuantitativo, 48 conocimientos específicos de Matemáticas, 24 pedagogía, **20 competencias blandas** y 12 situaciones de reflexión (sin calificación psicotécnica).
 - Simulacros mixtos cronometrados de **20/40/80 preguntas** con distribución **20/20/40/20**, mezcla de preguntas y de posiciones de respuesta, navegación y marcado para revisión.
 - Práctica por áreas con explicación inmediata, resultados, indicadores, revisión de errores e historial.
 - Datos guardados únicamente en **localStorage** del navegador. Exportación del historial como JSON. No hay cuentas, rastreadores ni sincronización entre dispositivos.
@@ -14,7 +14,9 @@ Simulador **gratuito, público, sin registro ni backend**, diseñado para practi
 
 ## Qué tan parecido es al examen real
 
-La estructura de cuatro componentes procede del **Decreto 574 de 2022** para docentes: lectura crítica 20 %, razonamiento cuantitativo 20 %, conocimientos específicos 40 %, pedagogía 20 %. La prueba de conocimientos es eliminatoria y clasificatoria y requiere mínimo 60/100; la prueba psicotécnica es aparte.
+La distribución porcentual usada como **referencia histórica** procede del **Decreto 574 de 2022** para docentes: lectura crítica 20 %, razonamiento cuantitativo 20 %, conocimientos específicos 40 %, pedagogía 20 %. La prueba de conocimientos es eliminatoria y clasificatoria y requiere mínimo 60/100; la prueba psicotécnica es aparte.
+
+**Actualización 2026:** el anexo técnico definitivo incluye **competencias blandas** en la prueba escrita, pero todavía no fija públicamente su peso interno. Por eso, las 20 prácticas de competencias blandas se ofrecen como módulo separado y NO se mezclan con los simulacros de distribución histórica 20/20/40/20. No confundir estas preguntas formativas con la prueba psicotécnica.
 
 **Limitaciones explícitas:** las duraciones de 30, 60 y 120 minutos, las cantidades de preguntas, la dificultad y el porcentaje de aciertos mostrado son **decisiones de práctica**, NO datos oficiales confirmados de las pruebas 2026–2027. Los casos de reflexión no reproducen ni califican psicotécnicos oficiales. Las instrucciones definitivas deben verificarse con la Guía de Orientación al Aspirante de la CNSC cuando sea publicada. El porcentaje del simulador no equivale a la nota calibrada de la CNSC.
 
@@ -27,6 +29,8 @@ La estructura de cuatro componentes procede del **Decreto 574 de 2022** para doc
 - [MEN · Estándares Básicos de Competencias](https://www.mineducacion.gov.co/1780/w3-article-340021.html)
 - [MEN · Estándares de Matemáticas (PDF)](https://www.mineducacion.gov.co/1621/articles-116042_archivo_pdf2.pdf)
 - [Colombia Aprende · DBA Matemáticas](https://colombiaaprende.edu.co/recurso-coleccion/derechos-basicos-de-aprendizaje-matematicas)
+- [MEN · Resolución 3842 de 2022, manual de funciones](https://www.mineducacion.gov.co/1780/articles-373226_recurso_2.pdf)
+- [MEN · Guía 31, evaluación de desempeño y competencias comportamentales](https://www.mineducacion.gov.co/portal/men/Publicaciones/Guias/169241:Guia-No-31-Guia-Metodologica-Evaluacion-Anual-de-Desempeno-Laboral)
 - [SIMO · OPEC e inscripciones](https://simo.cnsc.gov.co)
 
 **Para la aspirante ingeniera electrónica:** confirmar los requisitos de título profesional y demás condiciones en la OPEC específica de Docente de Matemáticas de cada entidad territorial, además de los documentos del proceso.
