@@ -5,8 +5,8 @@ const js=n=>fs.readFileSync(require("node:path").join(root,n),"utf8");
 new (require("node:vm").Script)(js("app.js"),{filename:"app.js"});
 const ctx={window:{}};vm.runInNewContext(js("questions.js"),ctx,{filename:"questions.js"});
 const B=ctx.window.AULA_QUESTIONS,A=ctx.window.AULA_AREAS;
-assert.equal(B.length,132,"132 ítems esperados");
-const expected={lectura:24,cuantitativo:24,matematicas:48,pedagogia:24,psicotecnica:12};
+assert.equal(B.length,152,"152 ítems esperados");
+const expected={lectura:24,cuantitativo:24,matematicas:48,pedagogia:24,psicotecnica:12,blandas:20};
 const seen=new Set();
 for(const q of B){
  assert.ok(q.id&&!seen.has(q.id),"identificador único");seen.add(q.id);
@@ -38,4 +38,4 @@ click("option",0);click("finish-dialog");click("confirm-modal");
 const H=JSON.parse(local.get("aulamerito_history_v1"));
 assert.equal(H.length,1);assert.equal(H[0].answered,1);
 assert.ok(nodes["app-content"].innerHTML.includes("RESULTADOS DE LA SESIÓN"));
-console.log("OK: 132 preguntas válidas, 5 áreas, simulación 80 ítems 20/20/40/20 y flujo de resultados.");
+console.log("OK: 152 preguntas válidas, 5 áreas, simulación 80 ítems 20/20/40/20 y flujo de resultados.");
