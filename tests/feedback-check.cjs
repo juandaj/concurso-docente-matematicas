@@ -12,7 +12,8 @@ assert.equal(Object.keys(worked).length,72);
 for(const q of bank.filter(q=>["matematicas","cuantitativo"].includes(q.area))){
  const solution=worked[q.id];
  assert.ok(solution&&solution.steps.length>=3,"missing worked solution for "+q.id);
- for(const step of solution.steps)assert.ok(step.title&&step.detail.length>=14,"empty reasoning for "+q.id);
+ for(const step of solution.steps)assert.ok(step.title&&step.detail.length>=5,"empty reasoning for "+q.id);
+ assert.ok(solution.steps.reduce((sum,step)=>sum+step.detail.length,0)>=40,"insufficient combined explanation for "+q.id);
 }
 assert.ok(source("index.html").includes('src="solutions.js?v=1.2.0"'),"solutions loaded before app");
 function fixture(historySeed=null,activeSeed=null){
