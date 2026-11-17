@@ -46,3 +46,17 @@
 .solution-steps p{margin:0;font-size:13px;line-height:1.75;color:#47645a;overflow-wrap:anywhere}
 .review-item .solution-panel{margin-top:15px}
 @media(max-width:780px){.feedback-picker{padding:16px}.feedback-choices{grid-template-columns:1fr}.feedback-choice{min-height:76px}.solution-panel{padding:15px 12px}.solution-steps>li{padding-left:37px}.feedback-picker-title strong{font-size:14px}}
+
+
+/* Selector de dificultad: independiente del modo de retroalimentación. */
+.level-panel{background:#fff;border:1px solid #e3e5ef;border-radius:18px;padding:22px 23px;margin:0 0 19px;box-shadow:var(--shadow)}
+.level-panel-title strong{font:800 15px 'Plus Jakarta Sans',sans-serif;color:#25304b}
+.level-panel-title p{font-size:12px;color:#78859b;margin:3px 0 14px}
+.level-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.level-choice{min-height:103px;display:flex;flex-direction:column;gap:6px;text-align:left;border-radius:13px;border:1.5px solid #e1e5f0;background:#fbfcff;padding:15px 14px;color:#344261}
+.level-choice:hover{background:#f7f5ff;border-color:#b4acf4}
+.level-choice.selected{background:#f0edff;border-color:#7467e7;box-shadow:inset 0 0 0 1px #7467e7}
+.level-choice strong{font-size:13px;color:#3a3474}
+.level-choice span{font-size:11px;line-height:1.55;color:#758199}
+.level-choice.selected span{color:#60558f}
+@media(max-width:850px){.level-choices{grid-template-columns:1fr}.level-choice{min-height:auto}.level-panel{padding:17px 15px}}
