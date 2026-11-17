@@ -2,15 +2,21 @@
 
 Simulador **gratuito, público, sin registro ni backend**, diseñado para practicar para **Docente de Matemáticas en Armenia/Quindío**. No representa preguntas oficiales reservadas.
 
-**[Abrir la web (requiere activar GitHub Pages)](https://juandaj.github.io/concurso-docente-matematicas/)**
+**[Abrir la web publicada en GitHub Pages](https://juandaj.github.io/concurso-docente-matematicas/)**
 
 ## Qué incluye
 
 - **152 ítems originales:** 24 lectura crítica, 24 razonamiento cuantitativo, 48 conocimientos específicos de Matemáticas, 24 pedagogía, **20 competencias blandas** y 12 situaciones de reflexión (sin calificación psicotécnica).
 - Simulacros mixtos cronometrados de **20/40/80 preguntas** con distribución **20/20/40/20**, mezcla de preguntas y de posiciones de respuesta, navegación y marcado para revisión.
-- Práctica por áreas con explicación inmediata, resultados, indicadores, revisión de errores e historial.
+- **Dos modalidades seleccionables antes de iniciar cualquier práctica:** **Aprender paso a paso**, con solución inmediata y sin cronómetro, o **Modo examen**, sin pistas y con corrección al finalizar. Ambas funcionan en simulacros mixtos y por área.
+- **72 procedimientos matemáticos desarrollados paso a paso** (24 razonamiento cuantitativo y 48 Matemáticas), con fórmulas, cálculos y comprobaciones. Los demás ítems conservan sus explicaciones pedagógicas.
+- Resultados, indicadores, revisión de errores e historial.
 - Datos guardados únicamente en **localStorage** del navegador. Exportación del historial como JSON. No hay cuentas, rastreadores ni sincronización entre dispositivos.
 - Interfaz responsive; atajos de teclado A/B/C/D o 1–4 para responder, flechas para avanzar y F para marcar.
+
+## Compatibilidad y actualización
+
+El modo de corrección elegido se guarda en el navegador y no modifica las sesiones anteriores. Los registros previos de `localStorage` conservan su compatibilidad: en una revisión histórica también se muestra el nuevo procedimiento cuando existe. En GitHub Pages, los cambios en la rama `main` se publican automáticamente. Se añadieron parámetros de versión a los archivos estáticos para reducir problemas por caché.
 
 ## Qué tan parecido es al examen real
 
@@ -46,7 +52,7 @@ No requiere comprar dominio, alquilar servidor o ejecutar un build. [Guía ofici
 
 ## Desarrollo
 
-Aplicación estática en `index.html`, `styles.css`, `app.js` y `questions.js`. Para probar localmente: ejecutar `python -m http.server 8000` en este directorio y abrir `http://localhost:8000`. No hay dependencias.
+Aplicación estática en `index.html`, `styles.css`, `app.js`, `questions.js` y `solutions.js`. Para probar localmente: ejecutar `python -m http.server 8000` en este directorio y abrir `http://localhost:8000`. No hay dependencias de ejecución. Ejecutar `npm test` (requiere Node.js) para validar banco, procedimientos y regresiones de los dos modos.
 
 Para ampliar el banco, añadir preguntas con cuatro opciones y justificación individual en `questions.js`, evitando repeticiones, respuestas predecibles y distractores absurdos.
 
