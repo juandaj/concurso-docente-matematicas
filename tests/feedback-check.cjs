@@ -14,7 +14,7 @@ for(const q of bank.filter(q=>["matematicas","cuantitativo"].includes(q.area))){
  assert.ok(solution&&solution.steps.length>=3,"missing worked solution for "+q.id);
  for(const step of solution.steps)assert.ok(step.title&&step.detail.length>=14,"empty reasoning for "+q.id);
 }
-assert.ok(source("index.html").includes('src="solutions.js?v=1.1.0"'),"solutions loaded before app");
+assert.ok(source("index.html").includes('src="solutions.js?v=1.2.0"'),"solutions loaded before app");
 function fixture(historySeed=null,activeSeed=null){
  const nodes={},listeners={},memory=new Map();
  if(historySeed)memory.set("aulamerito_history_v1",JSON.stringify(historySeed));
