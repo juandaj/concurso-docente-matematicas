@@ -8,7 +8,10 @@ const CONTENT=document.getElementById("app-content");
 const MODAL=document.getElementById("modal-root");
 const STORAGE_ACTIVE="aulamerito_active_v1";
 const STORAGE_HISTORY="aulamerito_history_v1";
-const VERSION="1.1.0";
+const VERSION="1.2.0";
+const STORAGE_DIFFICULTY="aulamerito_difficulty_v1";
+let selectedDifficulty=read(STORAGE_DIFFICULTY,"avanzado");
+if(!["avanzado","mixto","fundamentos"].includes(selectedDifficulty))selectedDifficulty="avanzado";
 const STORAGE_FEEDBACK="aulamerito_feedback_v1";
 let preferred=readPreferences();
 const CORE=["lectura","cuantitativo","matematicas","pedagogia"];
@@ -43,12 +46,27 @@ function date(s){return new Date(s).toLocaleDateString("es-CO",{day:"numeric",mo
 function fmtSec(sec){const x=Math.max(0,Math.floor(sec));return String(Math.floor(x/60)).padStart(2,"0")+":"+String(x%60).padStart(2,"0")}
 function fmtClock(s){const x=Math.max(0,Math.floor(s));return String(Math.floor(x/3600)).padStart(2,"0")+":"+String(Math.floor((x%3600)/60)).padStart(2,"0")+":"+String(x%60).padStart(2,"0")}
 function areaName(a){return AREAS[a]?.label||a}
-function areaCount(a){return BANK.filter(q=>q.area===a).length}
+function areaPool(a,level=selectedDifficulty){
+ const pool=BANK.filter(q=>q.area===a);
+ if(a==="psicotecnica"||level==="mixto")return pool;
+ const narrowed=pool.filter(q=>level==="avanzado"?q.difficulty==="avanzado":q.difficulty!=="avanzado");
+ return narrowed.length?narrowed:pool;
+}
+function areaCount(a){return areaPool(a).length}
+function levelLabel(level){return level==="avanzado"?"Avanzado":level==="mixto"?"Mixto":"Fundamentos"}
+function levelSelector(){
+ const modes=[
+ ["avanzado","Avanzado","Casos largos, modelación, interpretación y distractores plausibles. Basado en estilo de guías históricas."],
+ ["mixto","Mixto","Combina problemas exigentes con preguntas básicas para consolidar conocimientos."],
+ ["fundamentos","Fundamentos","Ejercicios de la versión inicial, adecuados para repasar las bases."]
+ ];
+ return '<div class="level-panel"><div class="level-panel-title"><strong>Selecciona la dificultad</strong><p>Recomendado: avanzado. No equivale a una calibración oficial del examen.</p></div><div class="level-choices">'+modes.map(([key,title,desc])=>'<button type="button" class="level-choice'+(selectedDifficulty===key?' selected':'')+'" aria-pressed="'+(selectedDifficulty===key)+'" data-action="set-level" data-level="'+key+'"><strong>'+title+'</strong><span>'+desc+'</span></button>').join('')+'</div></div>';
+}
 function button(text,action,style,extra){return '<button class="btn '+(style||"btn-primary")+'" data-action="'+esc(action)+'" '+(extra||"")+">"+text+"</button>"}
 function tag(text,type){return '<span class="pill '+(type||"")+'">'+text+"</span>"}
 function header(k,title,desc){return '<div class="page-heading"><div><span class="kicker">'+k+'</span><h1>'+title+'</h1>'+(desc?'<p>'+desc+"</p>":"")+"</div></div>"}
 function section(title,extra){return '<div class="section-heading"><h2>'+title+"</h2>"+(extra||"")+"</div>"}
-function infoBox(){return '<div class="note-box"><strong>Simulador independiente.</strong> Los ítems son originales y no han sido publicados por la CNSC. El modo mixto usa como referencia histórica 20 / 20 / 40 / 20 (Decreto 574 de 2022). El anexo 2026 también contempla competencias blandas, disponibles en un módulo aparte: sus pesos internos aún no están confirmados en una guía oficial. Cantidades y tiempos de esta web son solo de práctica.</div>'}
+function infoBox(){return '<div class="note-box"><strong>Simulador independiente.</strong> Los ítems son originales y no han sido publicados por la CNSC. La ponderación 20 / 20 / 40 / 20 es una referencia histórica (Decreto 574 de 2022), no la distribución confirmada de la convocatoria actual. Los nuevos casos avanzados reproducen procesos cognitivos descritos en guías públicas, no preguntas oficiales. El anexo 2026 también contempla competencias blandas, disponibles en un módulo aparte: sus pesos internos aún no están confirmados en una guía oficial. Cantidades y tiempos de esta web son solo de práctica.</div>'}
 function topicCard(key){const a=AREAS[key];return '<button class="topic-card" data-action="area" data-area="'+key+'"><span class="topic-icon tone-'+a.tone+'">'+a.icon+'</span><h3>'+esc(a.label)+'</h3><p>'+esc(a.desc)+'</p><span class="topic-cta">'+areaCount(key)+' preguntas disponibles · Practicar →</span></button>'}
 function metric(title,val,note,icon){return '<div class="stat-card"><div class="stat-top"><span class="stat-title">'+title+'</span><span class="stat-icon">'+icon+'</span></div><strong>'+val+'</strong><span class="stat-note">'+note+"</span></div>"}
 function validResults(){return history.filter(h=>!h.psych&&h.total>0)}
@@ -76,6 +94,7 @@ return '<div class="mode-card"><span class="mode-emoji">'+icon+'</span><h3>'+tit
 function sims(){
 CONTENT.innerHTML=header("ENTRENA CON INTENCIÓN","Simulacros de práctica","Elige la duración. El simulacro mixto usa la distribución histórica 20 / 20 / 40 / 20, no confirmada para 2026. Practica competencias blandas por separado.")+
 (active?'<div style="margin-bottom:20px">'+heroResume()+'</div>':"")+
+levelSelector()+
 feedbackSelector('mixed')+
 '<div class="grid-3">'+
 modeCard("⚡","Rápido","Una sesión de repaso cuando dispones de poco tiempo. Preguntas aleatorias.",20,preferred.mixed==="instant"?"Sin cronómetro":"30 min · práctica","start-quick")+
@@ -87,6 +106,7 @@ section("Distribución de preguntas")+
 }
 function temas(){
 CONTENT.innerHTML=header("APRENDIZAJE ENFOCADO","Práctica por componente","Escoge si quieres aprender con explicaciones al instante o comprobar tus respuestas al terminar.")+
+levelSelector()+
 feedbackSelector("area")+
 '<div class="topic-grid">'+CORE.concat(["blandas"]).map(topicCard).join("")+'</div>'+
 section("Práctica situacional y psicotécnica")+
@@ -107,6 +127,8 @@ section("Historial de sesiones")+
 '<div style="margin-top:18px;display:flex;justify-content:flex-end">'+(total?button("Exportar progreso (JSON)","export","btn-outline"):"")+'</div>';
 }
 const sources=[
+["CNSC–ICFES · Guía histórica docente con ejemplos (2009)","Publicación oficial con modelos de preguntas de Matemáticas: interpretar, argumentar y proponer. Referencia histórica, no examen vigente.","https://www.mineducacion.gov.co/1621/articles-190397_archivo_pdf_guia.pdf"],
+["CNSC · Guías del proceso docente 2022","Material y guías públicas de pruebas docentes anteriores; no contiene cuadernillos íntegros reservados.","https://www.cnsc.gov.co/convocatorias/directivos-docentes-y-docentes?field_tipo_de_contenido_convocat_target_id=64"],
 ["CNSC · Convocatoria Docentes 2026","Acuerdos, avisos, etapas y documentos oficiales.","https://www.cnsc.gov.co/convocatorias/docentes-y-directivos-docentes-2026"],
 ["CNSC · Anexo técnico 2026","Condiciones específicas de etapas del proceso de selección.","https://www.cnsc.gov.co/node/69894"],
 ["CNSC · Acuerdos Quindío y Armenia","Acuerdo 284 (Quindío) y acuerdo 279 (Armenia).","https://www.cnsc.gov.co/node/69870"],
@@ -127,7 +149,18 @@ section("Ruta sugerida para una ingeniera electrónica")+
 '<div class="card"><div class="steps"><div class="step"><p><strong>Confirmar requisitos.</strong> Verificar en SIMO la OPEC de docente de Matemáticas, título habilitante y entidad territorial.</p></div><div class="step"><p><strong>Diagnóstico.</strong> Realizar un simulacro completo y registrar las áreas débiles.</p></div><div class="step"><p><strong>Estudio disciplinar.</strong> Priorizar álgebra, funciones, geometría, estadística, probabilidad, cálculo y didáctica matemática.</p></div><div class="step"><p><strong>Pedagogía.</strong> Revisar evaluación formativa, DUA, inclusión, convivencia, PEI, SIEE y los DBA.</p></div><div class="step"><p><strong>Lectura y razonamiento.</strong> Practicar inferencias, evaluación de argumentos, tablas, porcentajes y modelación.</p></div><div class="step"><p><strong>Simular y corregir.</strong> Repetir pruebas con preguntas mezcladas y revisar cada explicación.</p></div></div></div>'+
 '<div style="margin-top:20px">'+infoBox()+"</div>";
 }
-function take(area,n){return shuffle(BANK.filter(q=>q.area===area)).slice(0,n)}
+function take(area,n){
+ if(area==="psicotecnica")return shuffle(areaPool(area,"fundamentos")).slice(0,n);
+ if(selectedDifficulty==="mixto"){
+  const advanced=shuffle(BANK.filter(q=>q.area===area&&q.difficulty==="avanzado"));
+  const basic=shuffle(BANK.filter(q=>q.area===area&&q.difficulty!=="avanzado"));
+  const count=Math.min(advanced.length,Math.round(n*0.65));
+  const chosen=[...advanced.slice(0,count),...basic.slice(0,Math.max(0,n-count))];
+  if(chosen.length<n)chosen.push(...advanced.slice(count,count+(n-chosen.length)));
+  return shuffle(chosen).slice(0,n);
+ }
+ return shuffle(areaPool(area)).slice(0,n);
+}
 function start(mode,area){
 if(active){showConfirm("Ya tienes una sesión en curso","Iniciar otra sesión reemplazará la sesión sin terminar. Los resultados anteriores no se borrarán.",()=>createSession(mode,area));return}
 createSession(mode,area);
@@ -142,7 +175,7 @@ else{let amount=mode==="full"?80:mode==="medium"?40:20;let weights={lectura:.2,c
 CORE.forEach(k=>picked.push(...take(k,Math.round(amount*weights[k]))));duration=feedback==="instant"?0:(amount===80?120*60:amount===40?60*60:30*60)}
 picked=shuffle(picked);
 const order={};picked.forEach(q=>order[q.id]=shuffle([0,1,2,3]));
-const ts=Date.now();active={id:ts,mode,area:area||null,ids:picked.map(q=>q.id),order,answers:{},flags:{},idx:0,started:ts,deadline:duration?ts+duration*1000:null,duration,feedback};save();currentView="exam";render();window.scrollTo(0,0)
+const ts=Date.now();active={id:ts,mode,area:area||null,level:selectedDifficulty,ids:picked.map(q=>q.id),order,answers:{},flags:{},idx:0,started:ts,deadline:duration?ts+duration*1000:null,duration,feedback};save();currentView="exam";render();window.scrollTo(0,0)
 }
 function finish(auto){
 if(!active)return;
@@ -150,7 +183,7 @@ const s=active;const rows=s.ids.map(id=>lookup[id]);const per={};CORE.concat(["b
 let correct=0,responded=0;
 rows.forEach(q=>{const answer=s.answers[q.id];if(answer!==undefined)responded++;if(q.answer!==null){per[q.area].total++;if(answer===q.answer){correct++;per[q.area].correct++}}});
 const psych=s.mode==="psych";const score=psych?null:Math.round(correct/rows.length*100);
-const result={id:s.id,mode:s.mode,area:s.area,feedback:sessionFeedback(s),label:modeName(s.mode,s.area),date:new Date().toISOString(),ids:s.ids,order:s.order,answers:s.answers,flags:s.flags,answered:responded,total:rows.length,correct,score,byArea:per,psych,seconds:Math.floor((Date.now()-s.started)/1000),auto:!!auto};
+const result={id:s.id,mode:s.mode,area:s.area,level:s.level||"fundamentos",feedback:sessionFeedback(s),label:modeName(s.mode,s.area),date:new Date().toISOString(),ids:s.ids,order:s.order,answers:s.answers,flags:s.flags,answered:responded,total:rows.length,correct,score,byArea:per,psych,seconds:Math.floor((Date.now()-s.started)/1000),auto:!!auto};
 history.push(result);if(history.length>75)history=history.slice(-75);active=null;save();reviewId=result.id;currentView="results";MODAL.innerHTML="";render();window.scrollTo(0,0);
 if(auto)toast("El tiempo de práctica terminó y se guardó tu resultado.");
 }
@@ -216,6 +249,11 @@ function dispatch(action,buttonEl){
 if(action==="go-temas")return navigate("temas");
 if(action==="go-simulacros")return navigate("simulacros");
 if(action==="go-progreso")return navigate("progreso");
+if(action==="set-level"){
+ const level=buttonEl.dataset.level;
+ if(!["avanzado","mixto","fundamentos"].includes(level))return;
+ selectedDifficulty=level;write(STORAGE_DIFFICULTY,selectedDifficulty);return render();
+}
 if(action==="set-feedback"){
  const section=buttonEl.dataset.section,mode=buttonEl.dataset.mode;
  if(!["mixed","area"].includes(section)||!["instant","deferred"].includes(mode))return;
