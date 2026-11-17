@@ -2,12 +2,15 @@
 (function(){
 "use strict";
 const BANK=window.AULA_QUESTIONS||[];
+const SOLUTIONS=window.AULA_SOLUTIONS||{};
 const AREAS=window.AULA_AREAS||{};
 const CONTENT=document.getElementById("app-content");
 const MODAL=document.getElementById("modal-root");
 const STORAGE_ACTIVE="aulamerito_active_v1";
 const STORAGE_HISTORY="aulamerito_history_v1";
-const VERSION="1.0.0";
+const VERSION="1.1.0";
+const STORAGE_FEEDBACK="aulamerito_feedback_v1";
+let preferred=readPreferences();
 const CORE=["lectura","cuantitativo","matematicas","pedagogia"];
 let currentView="inicio",reviewId=null,reviewFilter="all",toastTimer=null;
 let active=read(STORAGE_ACTIVE,null);
@@ -18,6 +21,21 @@ if(active&&(!Array.isArray(active.ids)||active.ids.some(id=>!lookup[id])))active
 const number=x=>new Intl.NumberFormat("es-CO").format(x);
 function read(k,fallback){try{const raw=localStorage.getItem(k);return raw?JSON.parse(raw):fallback}catch(_){return fallback}}
 function write(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}}
+function readPreferences(){const p=read(STORAGE_FEEDBACK,{});return {mixed:p.mixed==="instant"?"instant":"deferred",area:p.area==="deferred"?"deferred":"instant"}}
+function sessionFeedback(s){return s.feedback==="instant"||s.feedback==="deferred"?s.feedback:(s.mode==="area"||s.mode==="psych"?"instant":"deferred")}
+function feedbackLabel(mode){return mode==="instant"?"Aprender mientras practicas":"Simulacro sin pistas"}
+function feedbackSelector(section){
+ const selected=preferred[section],title=section==="mixed"?"¿Cómo quieres hacer el simulacro?":"¿Cómo quieres practicar este componente?";
+ return '<div class="feedback-picker" role="group" aria-label="'+title+'"><div class="feedback-picker-title"><strong>Elige la modalidad de corrección</strong><p>'+title+'</p></div><div class="feedback-choices">'+
+ ['instant','deferred'].map(mode=>'<button type="button" class="feedback-choice'+(selected===mode?' active':'')+'" aria-pressed="'+(selected===mode)+'" data-action="set-feedback" data-section="'+section+'" data-mode="'+mode+'"><span class="feedback-choice-icon">'+(mode==="instant"?"✦":"◷")+'</span><span><strong>'+(mode==="instant"?"Aprender paso a paso":"Modo examen")+'</strong><small>'+(mode==="instant"?"Corrige cada respuesta al instante y muestra la solución. Sin límite de tiempo.":"Sin pistas mientras respondes. Revisa todo al finalizar.")+'</small></span><span class="feedback-radio">'+(selected===mode?"✓":"")+'</span></button>').join('')+'</div></div>';
+}
+function solutionHTML(q){
+ const info=SOLUTIONS[q.id];
+ if(!info||!Array.isArray(info.steps)){
+   return '<div class="solution-panel"><div class="solution-heading">✦ '+(q.answer===null?"Reflexión sobre la situación":"¿Por qué esta respuesta?")+'</div><p>'+esc(q.explain)+'</p></div>';
+ }
+ return '<div class="solution-panel"><div class="solution-heading">✦ Solución explicada paso a paso</div><ol class="solution-steps">'+info.steps.map(step=>'<li><strong>'+esc(step.title)+'</strong><p>'+esc(step.detail)+'</p></li>').join('')+'</ol></div>';
+}
 function save(){write(STORAGE_ACTIVE,active);write(STORAGE_HISTORY,history)}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function shuffle(items){let a=items.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
@@ -58,21 +76,23 @@ return '<div class="mode-card"><span class="mode-emoji">'+icon+'</span><h3>'+tit
 function sims(){
 CONTENT.innerHTML=header("ENTRENA CON INTENCIÓN","Simulacros de práctica","Elige la duración. El simulacro mixto usa la distribución histórica 20 / 20 / 40 / 20, no confirmada para 2026. Practica competencias blandas por separado.")+
 (active?'<div style="margin-bottom:20px">'+heroResume()+'</div>':"")+
+feedbackSelector('mixed')+
 '<div class="grid-3">'+
-modeCard("⚡","Rápido","Una sesión de repaso cuando dispones de poco tiempo. Preguntas aleatorias.",20,"30 min · sugeridos","start-quick")+
-modeCard("◎","Intermedio","Equilibrio entre cobertura, análisis y resistencia.",40,"60 min · sugeridos","start-medium")+
-modeCard("◈","Completo","Entrena la concentración en los cuatro componentes sin revelación de respuestas.",80,"120 min · sugeridos","start-full")+
+modeCard("⚡","Rápido","Una sesión de repaso cuando dispones de poco tiempo. Preguntas aleatorias.",20,preferred.mixed==="instant"?"Sin cronómetro":"30 min · práctica","start-quick")+
+modeCard("◎","Intermedio","Equilibrio entre cobertura, análisis y resistencia.",40,preferred.mixed==="instant"?"Sin cronómetro":"60 min · práctica","start-medium")+
+modeCard("◈","Completo","Entrena los cuatro componentes con la modalidad de corrección que elijas.",80,preferred.mixed==="instant"?"Sin cronómetro":"120 min · práctica","start-full")+
 '</div><div style="margin-top:22px">'+infoBox()+'</div>'+
 section("Distribución de preguntas")+
 '<div class="card"><div class="grid-2">'+CORE.map(a=>'<div><span class="small strong">'+esc(areaName(a))+'</span><div class="weight-track"><div class="weight-fill" style="width:'+AREAS[a].weight+'%"></div></div><span class="subtle">'+AREAS[a].weight+' % · '+(AREAS[a].weight*80/100)+' ítems en el simulacro completo</span></div>').join("")+'</div><p style="font-size:12px;margin:16px 0 0">El cronómetro y el número de preguntas de estos modos son diseños de práctica y no deben confundirse con la duración real anunciada en la futura guía de orientación al aspirante.</p></div>';
 }
 function temas(){
-CONTENT.innerHTML=header("APRENDIZAJE ENFOCADO","Práctica por componente","Aprende con retroalimentación inmediata después de cada respuesta.")+
+CONTENT.innerHTML=header("APRENDIZAJE ENFOCADO","Práctica por componente","Escoge si quieres aprender con explicaciones al instante o comprobar tus respuestas al terminar.")+
+feedbackSelector("area")+
 '<div class="topic-grid">'+CORE.concat(["blandas"]).map(topicCard).join("")+'</div>'+
 section("Práctica situacional y psicotécnica")+
 '<div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap"><div><h3>◇ Situaciones de criterio profesional</h3><p style="margin:4px 0 0;font-size:12px;max-width:600px">12 situaciones de reflexión sobre ética, convivencia y trabajo docente. Sin puntuación ni supuestas respuestas oficiales; no sustituye la evaluación psicotécnica.</p></div>'+button("Comenzar →","start-psych","btn-soft")+"</div>"+
 section("Cómo practicar mejor")+
-'<div class="grid-2"><div class="card"><h3>Si vienes de Ingeniería Electrónica...</h3><p style="font-size:13px">Tu formación puede facilitar álgebra y funciones, pero no descuides lectura crítica, razonamiento cuantitativo ni didáctica. Resolver un problema y explicar cómo enseñarlo son competencias diferentes.</p></div><div class="card"><h3>Evita memorizar letras</h3><p style="font-size:13px">Las opciones de respuesta se mezclan en cada nueva sesión. En las prácticas por área recibirás una justificación; en los simulacros se revela al terminar.</p></div></div>';
+'<div class="grid-2"><div class="card"><h3>Si vienes de Ingeniería Electrónica...</h3><p style="font-size:13px">Tu formación puede facilitar álgebra y funciones, pero no descuides lectura crítica, razonamiento cuantitativo ni didáctica. Resolver un problema y explicar cómo enseñarlo son competencias diferentes.</p></div><div class="card"><h3>Evita memorizar letras</h3><p style="font-size:13px">Las opciones de respuesta se mezclan en cada nueva sesión. Puedes ver el procedimiento después de responder o reservarlo hasta el resultado, según el modo elegido.</p></div></div>';
 }
 function progreso(){
 const valid=validResults();const total=history.length;const recent=history.slice().reverse();
@@ -114,14 +134,15 @@ createSession(mode,area);
 }
 function createSession(mode,area){
 MODAL.innerHTML="";
+const feedback=mode==="psych"?"instant":mode==="area"?preferred.area:preferred.mixed;
 let picked=[],duration=0;
 if(mode==="psych"){picked=take("psicotecnica",12);duration=0}
-else if(mode==="area"){picked=take(area,Math.min(20,areaCount(area)));duration=0}
+else if(mode==="area"){picked=take(area,Math.min(20,areaCount(area)));duration=feedback==="deferred"?30*60:0}
 else{let amount=mode==="full"?80:mode==="medium"?40:20;let weights={lectura:.2,cuantitativo:.2,matematicas:.4,pedagogia:.2};
-CORE.forEach(k=>picked.push(...take(k,Math.round(amount*weights[k]))));duration=amount===80?120*60:amount===40?60*60:30*60}
+CORE.forEach(k=>picked.push(...take(k,Math.round(amount*weights[k]))));duration=feedback==="instant"?0:(amount===80?120*60:amount===40?60*60:30*60)}
 picked=shuffle(picked);
 const order={};picked.forEach(q=>order[q.id]=shuffle([0,1,2,3]));
-const ts=Date.now();active={id:ts,mode,area:area||null,ids:picked.map(q=>q.id),order,answers:{},flags:{},idx:0,started:ts,deadline:duration?ts+duration*1000:null,duration};save();currentView="exam";render();window.scrollTo(0,0)
+const ts=Date.now();active={id:ts,mode,area:area||null,ids:picked.map(q=>q.id),order,answers:{},flags:{},idx:0,started:ts,deadline:duration?ts+duration*1000:null,duration,feedback};save();currentView="exam";render();window.scrollTo(0,0)
 }
 function finish(auto){
 if(!active)return;
@@ -129,13 +150,13 @@ const s=active;const rows=s.ids.map(id=>lookup[id]);const per={};CORE.concat(["b
 let correct=0,responded=0;
 rows.forEach(q=>{const answer=s.answers[q.id];if(answer!==undefined)responded++;if(q.answer!==null){per[q.area].total++;if(answer===q.answer){correct++;per[q.area].correct++}}});
 const psych=s.mode==="psych";const score=psych?null:Math.round(correct/rows.length*100);
-const result={id:s.id,mode:s.mode,area:s.area,label:modeName(s.mode,s.area),date:new Date().toISOString(),ids:s.ids,order:s.order,answers:s.answers,flags:s.flags,answered:responded,total:rows.length,correct,score,byArea:per,psych,seconds:Math.floor((Date.now()-s.started)/1000),auto:!!auto};
+const result={id:s.id,mode:s.mode,area:s.area,feedback:sessionFeedback(s),label:modeName(s.mode,s.area),date:new Date().toISOString(),ids:s.ids,order:s.order,answers:s.answers,flags:s.flags,answered:responded,total:rows.length,correct,score,byArea:per,psych,seconds:Math.floor((Date.now()-s.started)/1000),auto:!!auto};
 history.push(result);if(history.length>75)history=history.slice(-75);active=null;save();reviewId=result.id;currentView="results";MODAL.innerHTML="";render();window.scrollTo(0,0);
 if(auto)toast("El tiempo de práctica terminó y se guardó tu resultado.");
 }
 function answer(index){
 if(!active)return;const q=lookup[active.ids[active.idx]];if(!q)return;
-if(active.mode==="area"&&active.answers[q.id]!==undefined)return;
+if(sessionFeedback(active)==="instant"&&active.answers[q.id]!==undefined)return;
 const original=active.order[q.id][index];active.answers[q.id]=original;save();renderExam(false)
 }
 function move(step){if(!active)return;active.idx=Math.min(active.ids.length-1,Math.max(0,active.idx+step));save();renderExam(true)}
@@ -144,17 +165,18 @@ function toggleFlag(){if(!active)return;const id=active.ids[active.idx];active.f
 function renderExam(doScroll){
 if(!active){navigate("inicio");return}
 const s=active,q=lookup[s.ids[s.idx]],resp=s.answers[q.id],n=answered(),percent=Math.round(n/s.ids.length*100);
-const practice=s.mode==="area",showWhy=practice&&resp!==undefined;
+const showWhy=sessionFeedback(s)==="instant"&&resp!==undefined;
 const psych=s.mode==="psych";
-CONTENT.innerHTML='<div class="exam-top"><div><span class="kicker">'+(psych?"PRÁCTICA REFLEXIVA":practice?"ENTRENAMIENTO GUIADO":"SIMULACRO CRONOMETRADO")+'</span><h2>'+esc(modeName(s.mode,s.area))+'</h2><p>Pregunta '+(s.idx+1)+' de '+s.ids.length+' · '+n+' respondidas</p></div><div style="display:flex;gap:10px;align-items:center">'+(s.deadline?'<div class="clock" id="clock" aria-label="Tiempo restante">--:--:--</div>':tag("Sin cronómetro","pill-purple"))+'</div></div>'+
+const instant=sessionFeedback(s)==="instant";
+CONTENT.innerHTML='<div class="exam-top"><div><span class="kicker">'+(psych?"PRÁCTICA REFLEXIVA":instant?"ENTRENAMIENTO CON SOLUCIONES":"SIMULACRO SIN PISTAS")+'</span><h2>'+esc(modeName(s.mode,s.area))+'</h2><p>Pregunta '+(s.idx+1)+' de '+s.ids.length+' · '+n+' respondidas</p></div><div style="display:flex;gap:10px;align-items:center">'+(s.deadline?'<div class="clock" id="clock" aria-label="Tiempo restante">--:--:--</div>':tag("Sin cronómetro","pill-purple"))+'</div></div>'+
 '<div class="exam-progress" aria-label="Progreso de respuestas"><span style="width:'+percent+'%"></span></div>'+
 '<div class="exam-layout"><section><div class="question-card"><div class="question-category">'+tag(esc(areaName(q.area)),"pill-purple")+tag(esc(q.topic),"")+'</div>'+
 (q.passage?'<div class="question-context">'+esc(q.passage)+'</div>':"")+
 '<div class="question-prompt">'+esc(q.prompt)+'</div>'+
 '<div class="option-list">'+s.order[q.id].map((ix,j)=>{const chosen=resp===ix;const correct=showWhy&&ix===q.answer;const wrong=showWhy&&chosen&&ix!==q.answer;const cls=correct?" correct":wrong?" incorrect":chosen?" selected":"";return '<button class="option'+cls+'" data-action="option" data-idx="'+j+'" '+(showWhy?"disabled ":"")+'aria-pressed="'+chosen+'"><span class="option-letter">'+String.fromCharCode(65+j)+'</span><span>'+esc(q.options[ix])+'</span></button>'}).join("")+"</div>"+
-(showWhy?'<div class="explanation"><strong>✓ Explicación</strong><p>'+esc(q.explain)+'</p></div>':psych&&resp!==undefined?'<div class="explanation" style="background:#f5f3ff;border-color:#e5dfff;color:#5a4dac"><strong>Reflexión</strong><p>'+esc(q.explain)+'</p></div>':"")+
+(showWhy?solutionHTML(q):"")+
 '<div class="question-controls">'+button(s.flags[q.id]?"⚑ Quitar marca":"⚑ Marcar para revisar","flag","btn-outline")+'<div class="control-right">'+button("← Anterior","prev","btn-outline",s.idx===0?"disabled":"")+button(s.idx===s.ids.length-1?"Ir al resumen →":"Siguiente →",s.idx===s.ids.length-1?"finish-dialog":"next","btn-primary")+'</div></div></div></section>'+
-'<aside class="exam-side"><div class="card"><h3>Navegación</h3><span class="subtle">Selecciona una pregunta para volver</span><div class="question-map">'+s.ids.map((id,i)=>'<button class="map-index'+(s.answers[id]!==undefined?" answered":"")+(s.idx===i?" current":"")+(s.flags[id]?" flagged":"")+'" data-action="goto" data-idx="'+i+'" aria-label="Pregunta '+(i+1)+(s.answers[id]!==undefined?", respondida":"")+'">'+(i+1)+'</button>').join("")+'</div><div class="legend"><span><i class="g-current"></i>Actual</span><span><i></i>Contestada</span><span><i class="g-flag"></i>Marcada</span></div><div style="margin-top:17px">'+button("Finalizar sesión","finish-dialog","btn-outline","style='width:100%'")+'</div></div><p class="subtle" style="padding:12px 6px">Las respuestas se guardan automáticamente en este dispositivo. '+(psych?"Este módulo no tiene respuestas oficiales ni nota.":practice?"Revisa la explicación de cada respuesta.":"Las respuestas y explicaciones se muestran al finalizar.")+'</p></aside></div>';
+'<aside class="exam-side"><div class="card"><h3>Navegación</h3><span class="subtle">Selecciona una pregunta para volver</span><div class="question-map">'+s.ids.map((id,i)=>'<button class="map-index'+(s.answers[id]!==undefined?" answered":"")+(s.idx===i?" current":"")+(s.flags[id]?" flagged":"")+'" data-action="goto" data-idx="'+i+'" aria-label="Pregunta '+(i+1)+(s.answers[id]!==undefined?", respondida":"")+'">'+(i+1)+'</button>').join("")+'</div><div class="legend"><span><i class="g-current"></i>Actual</span><span><i></i>Contestada</span><span><i class="g-flag"></i>Marcada</span></div><div style="margin-top:17px">'+button("Finalizar sesión","finish-dialog","btn-outline","style='width:100%'")+'</div></div><p class="subtle" style="padding:12px 6px">Las respuestas se guardan automáticamente en este dispositivo. '+(psych?"Este módulo no tiene respuestas oficiales ni nota.":instant?"Las respuestas quedan bloqueadas tras contestar y verás la solución paso a paso.":"Sin pistas hasta finalizar; al terminar podrás repasar las soluciones.")+'</p></aside></div>';
 updateClock();if(doScroll)window.scrollTo({top:0,behavior:"smooth"});
 }
 function updateClock(){if(!active||!active.deadline)return;const remaining=Math.ceil((active.deadline-Date.now())/1000);const el=document.getElementById("clock");if(remaining<=0){finish(true);return}if(el){el.textContent=fmtClock(remaining);el.classList.toggle("warn",remaining<300)}}
@@ -172,7 +194,7 @@ CONTENT.innerHTML=header("RESULTADOS DE LA SESIÓN",psych?"Tu reflexión ha qued
 function renderReviewContent(h){
 let items=h.ids.map((id,i)=>({q:lookup[id],i})).filter(x=>reviewFilter==="all"||h.answers[x.q.id]!==x.q.answer);
 if(!items.length)return '<div class="empty-state"><h3>¡Sin errores en este filtro!</h3><p>Has respondido correctamente todas estas preguntas.</p></div>';
-return items.map(x=>{const q=x.q,ans=h.answers[q.id],c=q.answer;const sel=ans===undefined?"Sin responder":q.options[ans];const ok=ans===c;return '<article class="review-item">'+tag("Pregunta "+(x.i+1)+" · "+esc(areaName(q.area)),"pill-purple")+(q.answer===null?tag("Sin calificación",""):tag(ok?"Correcta":"Para revisar",ok?"pill-green":"pill-red"))+(q.passage?'<p style="background:#f5f7fb;padding:10px 12px;border-radius:8px;white-space:pre-wrap">'+esc(q.passage)+'</p>':"")+'<h4>'+esc(q.prompt)+'</h4><p>Tu respuesta: <span class="choice">'+esc(sel)+'</span></p>'+(q.answer!==null?'<p>Respuesta esperada: <span class="choice">'+esc(q.options[c])+'</span></p>':"")+'<div class="why">'+esc(q.explain)+'</div></article>'}).join("");
+return items.map(x=>{const q=x.q,ans=h.answers[q.id],c=q.answer;const sel=ans===undefined?"Sin responder":q.options[ans];const ok=ans===c;return '<article class="review-item">'+tag("Pregunta "+(x.i+1)+" · "+esc(areaName(q.area)),"pill-purple")+(q.answer===null?tag("Sin calificación",""):tag(ok?"Correcta":"Para revisar",ok?"pill-green":"pill-red"))+(q.passage?'<p style="background:#f5f7fb;padding:10px 12px;border-radius:8px;white-space:pre-wrap">'+esc(q.passage)+'</p>':"")+'<h4>'+esc(q.prompt)+'</h4><p>Tu respuesta: <span class="choice">'+esc(sel)+'</span></p>'+(q.answer!==null?'<p>Respuesta esperada: <span class="choice">'+esc(q.options[c])+'</span></p>':"")+solutionHTML(q)+'</article>'}).join("");
 }
 function navigate(view){
 const allowed=["inicio","simulacros","temas","progreso","recursos","exam","results"];currentView=allowed.includes(view)?view:"inicio";if(currentView==="exam"&&!active)currentView="inicio";document.querySelectorAll(".nav-link").forEach(el=>el.classList.toggle("active",el.dataset.view===currentView));document.getElementById("sidebar").classList.remove("open");render();window.scrollTo(0,0);
@@ -194,6 +216,11 @@ function dispatch(action,buttonEl){
 if(action==="go-temas")return navigate("temas");
 if(action==="go-simulacros")return navigate("simulacros");
 if(action==="go-progreso")return navigate("progreso");
+if(action==="set-feedback"){
+ const section=buttonEl.dataset.section,mode=buttonEl.dataset.mode;
+ if(!["mixed","area"].includes(section)||!["instant","deferred"].includes(mode))return;
+ preferred[section]=mode;write(STORAGE_FEEDBACK,preferred);return render();
+}
 if(action==="start-full")return start("full");
 if(action==="start-medium")return start("medium");
 if(action==="start-quick")return start("quick");
