@@ -127,6 +127,7 @@ section("Historial de sesiones")+
 '<div style="margin-top:18px;display:flex;justify-content:flex-end">'+(total?button("Exportar progreso (JSON)","export","btn-outline"):"")+'</div>';
 }
 const sources=[
+["ICFES · Cuadernillos liberados Saber 11, Matemáticas y Lectura Crítica","Preguntas REALES y explicadas de Saber 11; útiles para razonar y analizar opciones, pero no corresponden al concurso docente.","https://www.icfes.gov.co/caja-de-herramientas-saber-11/practica/"],
 ["CNSC–ICFES · Guía histórica docente con ejemplos (2009)","Publicación oficial con modelos de preguntas de Matemáticas: interpretar, argumentar y proponer. Referencia histórica, no examen vigente.","https://www.mineducacion.gov.co/1621/articles-190397_archivo_pdf_guia.pdf"],
 ["CNSC · Guías del proceso docente 2022","Material y guías públicas de pruebas docentes anteriores; no contiene cuadernillos íntegros reservados.","https://www.cnsc.gov.co/convocatorias/directivos-docentes-y-docentes?field_tipo_de_contenido_convocat_target_id=64"],
 ["CNSC · Convocatoria Docentes 2026","Acuerdos, avisos, etapas y documentos oficiales.","https://www.cnsc.gov.co/convocatorias/docentes-y-directivos-docentes-2026"],
