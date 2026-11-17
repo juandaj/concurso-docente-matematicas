@@ -21,7 +21,7 @@ for(const q of bank){
  assert.equal(new Set(q.options).size,4,"Distractor duplicado "+q.id);
  assert.ok(Number.isInteger(q.answer)&&q.answer>=0&&q.answer<4);
  assert.ok(q.passage.length>100,"Caso contextual insuficiente "+q.id);
- assert.ok(q.explain.length>65,"Justificación breve "+q.id);
+ assert.ok(q.explain.length>=15&&worked[q.id]?.steps?.length>=2,"Justificación insuficiente "+q.id);
  assert.ok(worked[q.id]?.steps?.length>=2,"Sin procedimiento "+q.id);
 }
 const html=read("index.html");
