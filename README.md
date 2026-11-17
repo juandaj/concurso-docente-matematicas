@@ -6,7 +6,7 @@ Simulador **gratuito, público, sin registro ni backend**, diseñado para practi
 
 ## Qué incluye
 
-- **152 ítems originales:** 24 lectura crítica, 24 razonamiento cuantitativo, 48 conocimientos específicos de Matemáticas, 24 pedagogía, **20 competencias blandas** y 12 situaciones de reflexión (sin calificación psicotécnica).
+- **232 ítems originales:** 80 preguntas avanzadas nuevas (32 de Matemáticas, 16 de razonamiento cuantitativo, 16 de lectura crítica y 16 de pedagogía) y 152 ítems de la versión anterior, incluidas competencias blandas y situaciones de reflexión no psicométricas.
 - Simulacros mixtos cronometrados de **20/40/80 preguntas** con distribución **20/20/40/20**, mezcla de preguntas y de posiciones de respuesta, navegación y marcado para revisión.
 - **Dos modalidades seleccionables antes de iniciar cualquier práctica:** **Aprender paso a paso**, con solución inmediata y sin cronómetro, o **Modo examen**, sin pistas y con corrección al finalizar. Ambas funcionan en simulacros mixtos y por área.
 - **72 procedimientos matemáticos desarrollados paso a paso** (24 razonamiento cuantitativo y 48 Matemáticas), con fórmulas, cálculos y comprobaciones. Los demás ítems conservan sus explicaciones pedagógicas.
@@ -17,6 +17,20 @@ Simulador **gratuito, público, sin registro ni backend**, diseñado para practi
 ## Compatibilidad y actualización
 
 El modo de corrección elegido se guarda en el navegador y no modifica las sesiones anteriores. Los registros previos de `localStorage` conservan su compatibilidad: en una revisión histórica también se muestra el nuevo procedimiento cuando existe. En GitHub Pages, los cambios en la rama `main` se publican automáticamente. Se añadieron parámetros de versión a los archivos estáticos para reducir problemas por caché.
+
+## Dificultad y bancos de preguntas
+
+- **Avanzado (seleccionado por defecto):** 80 preguntas originales de varias etapas con textos extensos, tablas descritas, problemas vinculados y decisiones didácticas. Un simulacro completo de 80 usa exclusivamente esas preguntas: 32 de Matemáticas, 16 cuantitativas, 16 de lectura y 16 de pedagogía.
+- **Mixto:** aproximadamente 65 % avanzadas y el resto ejercicios de fundamentos, mezclados en cada sesión.
+- **Fundamentos:** conserva el banco anterior y sus explicaciones.
+- Los dos modos de corrección previos (**Aprender paso a paso** y **Modo examen**) siguen funcionando en cualquiera de los niveles.
+- **Compatibilidad:** no se han cambiado los identificadores de las 152 preguntas originales. Los resultados y exámenes pendientes guardados en el navegador continúan siendo interpretables.
+
+### Investigación y procedencia de los ítems
+
+Se consultó especialmente la **[Guía oficial histórica de orientación para selección docente CNSC–ICFES, publicada por el Ministerio de Educación](https://www.mineducacion.gov.co/1621/articles-190397_archivo_pdf_guia.pdf)**, que describe para **Matemáticas** conocimientos de número, función, medida y aleatoriedad y procesos de **interpretar, argumentar y proponer**. El documento incluye ejemplos públicos de preguntas de Matemáticas. Las páginas de [convocatorias docentes 2022 de la CNSC](https://www.cnsc.gov.co/convocatorias/directivos-docentes-y-docentes?field_tipo_de_contenido_convocat_target_id=64) también contienen guías históricas para comparación.
+
+**No es un banco de cuadernillos oficiales completos**: las preguntas de la aplicación son nuevas y originales, inspiradas en las características públicas de las guías, no copiadas de pruebas reservadas. No existe evidencia para asignarles equivalencia psicométrica a las preguntas definitivas de 2026–2027. La dificultad 'Avanzado' es una valoración pedagógica interna, no un nivel oficial certificado.
 
 ## Qué tan parecido es al examen real
 
